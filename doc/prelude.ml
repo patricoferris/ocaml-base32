@@ -1,1 +1,1 @@
-#require "base32";;
+#require "base32"
