@@ -1,0 +1,4 @@
+(mdx
+  (packages base32)
+  (preludes ./doc/prelude.ml)
+  (files README.md))
