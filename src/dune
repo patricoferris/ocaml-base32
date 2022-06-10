@@ -1,4 +1,4 @@
 (library
  (name base32)
  (public_name base32)
- (libraries bytes))
+ (libraries bytes optint))

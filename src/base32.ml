@@ -172,6 +172,17 @@ let encode_exn ?pad ?alphabet ?off ?len input =
   | Ok v -> v
   | Error (`Msg err) -> invalid_arg err
 
+module I63 = struct
+  include Optint.Int63
+
+  let (lsl) a b = shift_left a b
+  let (lor) a b = logor a b
+  let (land) a b = logand a b
+
+  let (lsr) a b = shift_right_logical a b
+
+end
+
 let decode_sub ?(pad = true) { dmap; _ } ?(off = 0) ?len input =
   let len =
     match len with Some len -> len | None -> String.length input - off
@@ -209,13 +220,14 @@ let decode_sub ?(pad = true) { dmap; _ } ?(off = 0) ?len input =
 
     (* From 8 bytes to 5 bytes *)
     let emit b1 b2 b3 b4 b5 b6 b7 b8 j =
+      let open I63 in
       let x =
         (b1 lsl 35) lor (b2 lsl 30) lor (b3 lsl 25) lor (b4 lsl 20)
         lor (b5 lsl 15) lor (b6 lsl 10) lor (b7 lsl 5) lor b8
       in
-      set_be_uint16 res j (x lsr 24);
-      set_be_uint16 res (j + 2) ((x lsr 8) land 0xffff);
-      set_uint8 res (j + 4) (x land 0xff)
+      set_be_uint16 res j (x lsr 24 |> to_int);
+      set_be_uint16 res (j + 2) ((x lsr 8) land (of_int 0xffff) |> to_int);
+      set_uint8 res (j + 4) (x land (of_int 0xff) |> to_int)
     in
 
     let dmap i =
@@ -307,7 +319,7 @@ let decode_sub ?(pad = true) { dmap; _ } ?(off = 0) ?len input =
         in
 
         (* [Not_found] iff [x ∉ alphabet and x <> '='] can leak. *)
-        emit b1 b2 b3 b4 b5 b6 b7 b8 j;
+        emit (I63.of_int b1) (I63.of_int b2) (I63.of_int b3) (I63.of_int b4) (I63.of_int b5) (I63.of_int b6) (I63.of_int b7) (I63.of_int b8) j;
 
         if i + 8 = n (* end of input in anyway *) then
           match pad with 0 -> 0 | 3 -> 2 | 4 -> 3 | 6 -> 4 | pad -> pad

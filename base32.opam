@@ -11,6 +11,7 @@ bug-reports: "https://github.com/patricoferris/ocaml-base32/issues"
 depends: [
   "dune" {>= "2.9"}
   "ocaml" {>= "4.08.0"}
+  "optint"
   "alcotest" {with-test}
   "mdx" {with-test}
   "odoc" {with-doc}
