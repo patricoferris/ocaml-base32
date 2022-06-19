@@ -1,6 +1,8 @@
 (lang dune 2.9)
 (using mdx 0.1)
 
+(name base32)
+
 (generate_opam_files true)
 
 (source (github patricoferris/ocaml-base32))
